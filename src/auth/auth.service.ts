@@ -2,6 +2,7 @@
 import {
   BadRequestException,
   ConflictException,
+
   Injectable,
   NotFoundException,
   NotImplementedException,
@@ -56,27 +57,41 @@ export class AuthService {
       image: image.secure_url,
       userStatus,
     });
-    return { success: 'User created' };
+    return { success: true, message: "User has been created!" };
+  }
+  // returns user by email
+  async findUserByEmail (email: string){
+    const user = await this.userModel.findOne({email});
+    return user;
+  }
+  // checks password
+  async matchPassword(password:string, hash:string){
+    const passwordMatched = await bcrypt.compare(password, hash);
+    if(passwordMatched){
+      return true;
+    }
+    return false;
+  }
+  // assign token
+  async assignToken(id:string){
+    return { token: this.jwtService.sign({ id }) };
   }
   // login controller
   async logIn(logInDto: LogInDto) {
     try {
       const { email, password } = logInDto;
+      console.log(email, password)
       const user = await this.userModel.findOne({ email: email });
-      if (!user) {
-      }
-      if (user.userStatus === 'block') {
-        // res.status(403).json({message: "You can not login. You are blocked by"})
-      }
+      console.log(user);
+     
+     
       const passwordMatched = await bcrypt.compare(password, user.password);
       if (!passwordMatched) {
-        throw new BadRequestException(
-          'Wrong passport. Please try right password!',
-        );
+        throw new BadRequestException();
       }
       return { token: this.jwtService.sign({ id: user._id }) };
     } catch (err) {
-      return { error: 'Server error occurred!' };
+      return { error: 'Server error occurred!!!!!!' };
     }
   }
   // block or unblock user

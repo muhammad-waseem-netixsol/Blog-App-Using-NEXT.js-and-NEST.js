@@ -1,4 +1,4 @@
-import { Body, Controller,  Param, Patch, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller,  ForbiddenException,  HttpStatus,  NotFoundException,  Param, Patch, Post, Req, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/signup.dto';
 import { LogInDto } from './dto/login.dto';
@@ -43,9 +43,23 @@ export class AuthController {
   @ApiOperation({summary:"THIS LOGS YOU IN"})
   @ApiResponse({status: 200, description: "SUCCESSFULL"})
   @ApiResponse({status: 404, description: "BAD REQUEST"})
-  logIn(@Body() logInDto:LogInDto) {
-    console.log(logInDto)
-    return this.authService.logIn(logInDto);
+  async logIn(@Body() logInDto:LogInDto) {
+    const { email } = logInDto;
+    // using find user service
+    const user = await this.authService.findUserByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException("Invalid Credentials!");
+    }
+    if (user.userStatus === 'block') {
+      throw new ForbiddenException("This user is blocked by admin. Contact admin!")
+    }
+    const {password} = logInDto;
+    const passwordMatched = await this.authService.matchPassword(password, user.password);
+    if(!passwordMatched){
+      throw new UnauthorizedException("Invalid Credentials!");
+    }
+    this.authService.assignToken(user._id);
+     return this.authService.logIn(logInDto);
   }
   @Patch(":userId")
   @ApiOperation({summary:"USER STATUS"})

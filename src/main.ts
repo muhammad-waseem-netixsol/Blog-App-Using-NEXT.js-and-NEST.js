@@ -4,13 +4,13 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
   // swagger setup
   const config = new DocumentBuilder()
-  .setTitle('Contacts Api')
-  .setDescription('Built in NEST.js for contact CRUD operations...')
+  .setTitle('Blog Api')
+  .setDescription('Built in NEST.js for...')
   .setVersion('1.0')
-  .addTag('contacts')
+  .addTag('blogs')
   .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document, {
@@ -26,7 +26,7 @@ async function bootstrap() {
       'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.15.5/swagger-ui.css',
     ],
   });
-SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document);
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(3001);
 }
