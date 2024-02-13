@@ -1,4 +1,4 @@
-import { Body, Controller,  ForbiddenException,  HttpStatus,  NotFoundException,  Param, Patch, Post, Req, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller,  ForbiddenException,  Param, Patch, Post, Req, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/signup.dto';
 import { LogInDto } from './dto/login.dto';
